@@ -82,8 +82,6 @@ function configure_user_bazelrc() {
     fi
 
     {
-        echo "\n"
-
         echo startup --output_base=$HOME/bazel_output_base # should we move the whole output_base to tmpfs?
 
         echo build --config=buildkite
@@ -126,7 +124,7 @@ function configure_user_bazelrc() {
         echo build:buildkite --remote_download_toplevel
         echo build:buildkite --remote_max_connections=1000 # speed up reads, maybe
         echo "\n"
-    } >> "$(git rev-parse --show-toplevel)"/user.bazelrc
+    } >"$(git rev-parse --show-toplevel)"/user.bazelrc
 }
 
 function bazel_with_flareparse() {
