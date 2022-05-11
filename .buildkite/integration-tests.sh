@@ -1,7 +1,7 @@
 #!/usr/bin/env bash --login --noprofile
 
 source "$(git rev-parse --show-toplevel)"/.buildkite/common.sh
-source "$(git rev-parse --show-toplevel)"/.github/xcode_select.sh
+source "$(git rev-parse --show-toplevel)"/.github/workflows/xcode_select.sh
 
 configure_user_bazelrc
 
