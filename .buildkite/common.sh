@@ -9,6 +9,9 @@ set -o errexit  # Exit immediately if a pipeline ... exits with a non-zero statu
 set -o pipefail # ... return value of a pipeline is the value of the last (rightmost) command to exit with a non-zero status
 set -o nounset  # Treat unset variables ... as an error
 
+# hope this works, since flare's mac worker doesn't have this dep baked in yet...
+gem install bundler:2.1.4
+
 function lowercase() {
     echo "$@" | tr '[:upper:]' '[:lower:]'
 }
