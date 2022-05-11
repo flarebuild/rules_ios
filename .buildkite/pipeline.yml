@@ -5,15 +5,45 @@ env:
   FLARE_INSIGHTS_API_URL: "https://api.stg.flare.build"
 
 steps:
+
+  - label: ":macos: :bazel: build arm64 simulator"
+    key: arm64-sim
+    agents:
+      queue: macos
+    command: .buildkite/arm64-simulator.sh
+    timeout_in_minutes: 20
+
   - label: ":macos: :bazel: build virtual frameworks"
     key: virt-frameworks
     agents:
       queue: macos
     command: .buildkite/virtual-frameworks.sh
     timeout_in_minutes: 20
+  
+  - label: ":macos: :bazel: multi arch support"
+    key: multi-arch
+    agents:
+      queue: macos
+    command: .buildkite/muti-arch.sh
+    timeout_in_minutes: 20
+
   - label: ":macos: :bazel: integation tests"
     key: int-tests
     agents:
       queue: macos
     command: .buildkite/integration-tests.sh
+    timeout_in_minutes: 28
+  
+  - label: ":macos: :bazel: xcodeproj tests"
+    key: xcodeproj-tests
+    agents:
+      queue: macos
+    command: .buildkite/xcodeproj-tests.sh
+    timeout_in_minutes: 28
+
+  - label: ":macos: :bazel: lldb tests"
+    key: lldb-tests
+    agents:
+      queue: macos
+    command: .buildkite/lldb-tests.sh
     timeout_in_minutes: 28
