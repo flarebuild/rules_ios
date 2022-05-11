@@ -10,7 +10,7 @@ set -o pipefail # ... return value of a pipeline is the value of the last (right
 set -o nounset  # Treat unset variables ... as an error
 
 # hope this works, since flare's mac worker doesn't have this dep baked in yet...
-gem install bundler:2.1.4
+sudo gem install bundler:2.1.4
 
 function lowercase() {
     echo "$@" | tr '[:upper:]' '[:lower:]'
