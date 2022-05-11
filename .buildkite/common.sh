@@ -94,7 +94,7 @@ function configure_user_bazelrc() {
         echo build:buildkite --disk_cache= #--disk_cache=$HOME/bazel_disk_cache # https://github.com/bazelbuild/bazel/pull/7512
         echo build:buildkite --repository_cache= --repository_cache=$HOME/bazel_repo_cache
 
-        mkdir -p /ramfs/bazel_sandbox >/dev/null && echo build:buildkite --sandbox_base=/ramfs/bazel_sandbox
+        #mkdir -p /ramfs/bazel_sandbox >/dev/null && echo build:buildkite --sandbox_base=/ramfs/bazel_sandbox
 
         #echo build:buildkite --noshow_progress
         #echo build:buildkite --ui_event_filters=error
