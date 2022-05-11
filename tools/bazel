@@ -1,0 +1,132 @@
+#!/usr/bin/env bash
+
+# flare.build - FlareParse hooks
+#
+# Bazel wrapper script, to be deployed to //tools/bazel during distribution.
+#
+# Runs flareparse either with it's bazel target, or with the override FLAREPARSE env var
+#
+# - Flags can be sent to flareparse via bazel build //... --flare_someflag
+# - Flareparse can be disabled on a run by passing --no_flare
+# - A full list of flareparse flags can be printed by passing --flare_help to a bazel build
+#
+# DEPRECATED AND UNSUPPORTED, DO NOT USE
+
+#set -e
+
+REPO_ROOT=$(dirname "$0")/../
+cd "$REPO_ROOT"
+
+export FLARE_LOG_ENCODER=console
+
+for arg in "$@" 
+do                  # only invoke Flareparse for these commands
+    if [[ "$arg" =~ ^(build|test|coverage|run)$ ]]
+    then
+        BUILD_OR_TEST=1 # unused but might be useful later
+        FLARE=1
+        COMMAND=$arg
+    fi
+done
+if [ ! $FLARE ]; then
+    BUILD_OR_TEST=0
+    NO_FLARE=1
+fi
+
+
+BAZEL=${BAZEL_REAL:-bazel}
+EXEC_LOG_PATH=/tmp/exec.log
+BES_FILE_PATH=/tmp/bes.log
+PREV_EXEC_LOG_PATH=/tmp/prev_exec.log
+if [[ -z ${FLAREPARSE+x} ]]; then # $FLAREPARSE is not set
+    if which flareparse >/dev/null; then
+        FLAREPARSE=$(which flareparse)
+    else
+        # assumes flare's monorepo
+        FLAREPARSE="$BAZEL run //src/go/cmd/flareparse/parser:flareparse --bes_backend= --"
+    fi
+fi
+INVOCATION_ID=$(uuidgen)
+KEEP_LOG=1
+
+BAZEL_FLAGS=()
+FLAREPARSE_FLAGS=()
+FLAREPARSE_FLAGS+=("--analyze_remote_cache_hit_rate")
+FLAREPARSE_FLAGS+=("--expand_targets=false")
+
+LOG_FLAG="--execution_log_binary_file=$EXEC_LOG_PATH"
+LOG_FLAG_SET=0
+BES_FLAG="--build_event_binary_file=$BES_FILE_PATH"
+BES_FLAG_SET=0
+ACTION_DIFF_ENABLED=0
+INVOCATION_ID_FLAG="--invocation_id=$INVOCATION_ID"
+
+if [[ $FLARE ]]
+then
+    echo >&2 "[FlareParse] Wrapped bazel $COMMAND invocation."
+else     
+    echo >&2 "[FlareParse] unsupported bazel command; disabling for this run."
+    exec "$BAZEL" "$@"
+    exit $?
+fi
+
+while [ $# -gt 0 ]
+do
+    if [ "$1" == "--" ] && [ "$BUILD_OR_TEST" == 1 ]
+    then
+        BAZEL_FLAGS+=($LOG_FLAG)
+        BAZEL_FLAGS+=($BES_FLAG)
+        LOG_FLAG_SET=1
+        BES_FLAG_SET=1
+    fi
+
+    if [[ "$1" == *"--tool_tag="* ]]; then
+        # don't run flareparse for IDEA plugin invocations, as this currently isn't working
+        NO_FLARE=1
+    elif [[ "$1" == "--flare_action_diff" ]]; then
+        ACTION_DIFF_ENABLED=1
+    elif [[ "$1" == "--flare_disable" ]]; then
+        NO_FLARE=1
+    elif [[ "$1" == *"--flare_"* ]]; then
+        # args starting with --flare_ are stripped of the flare_ prefix and passed to the flareparse,
+        # while being careful not to pass them to bazel.
+        FLAREPARSE_FLAGS+=("${1/flare_/}")
+    elif [[ "$1" == "--invocation_id="* ]]; then
+        # invocation id is already passed in options, don't rewrite
+        INVOCATION_ID_FLAG="$1"
+        BAZEL_FLAGS+=("$1")
+    else
+        BAZEL_FLAGS+=("$1")
+    fi
+    shift
+done
+
+if [ "$LOG_FLAG_SET" == "0" ] && [ "$NO_FLARE" != 1 ]; then
+    BAZEL_FLAGS+=($LOG_FLAG)
+    BAZEL_FLAGS+=($BES_FLAG)
+    FLAREPARSE_FLAGS+=($LOG_FLAG)
+    FLAREPARSE_FLAGS+=($BES_FLAG)
+    BAZEL_FLAGS+=($INVOCATION_ID_FLAG)
+    FLAREPARSE_FLAGS+=($INVOCATION_ID_FLAG)
+fi
+
+$BAZEL "${BAZEL_FLAGS[@]}"
+BAZEL_EXIT=$?
+
+if [ -f "$EXEC_LOG_PATH" ] && [ "$NO_FLARE" != 1 ]; then
+    $FLAREPARSE "${FLAREPARSE_FLAGS[@]}"
+    if [ -f "$PREV_EXEC_LOG_PATH" ] && [ "$ACTION_DIFF_ENABLED" == 1 ]; then
+          COMPARE_FLAGS=("--include_inputs")
+          COMPARE_FLAGS+=($LOG_FLAG)
+          COMPARE_FLAGS+=("--compare_to=$PREV_EXEC_LOG_PATH")
+         $FLAREPARSE "${COMPARE_FLAGS[@]}"
+    fi
+    cp "$EXEC_LOG_PATH" "$PREV_EXEC_LOG_PATH"
+    if [ "$KEEP_LOG" != 1 ]; then
+        rm -f "$EXEC_LOG_PATH"
+        rm -f "$BES_FILE_PATH"
+    fi
+    echo >&2 "you can pass flag --flare_action_diff to understand remote cache misses"
+fi
+
+exit $BAZEL_EXIT
