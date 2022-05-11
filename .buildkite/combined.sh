@@ -10,6 +10,8 @@ bazel clean
 
 # all build steps from github combined:
 
+cd $(git rev-parse --show-toplevel)
+
 # from arm64
 bazel build --ios_multi_cpus=sim_arm64  --features apple.virtualize_frameworks -- //... -//tests/ios/...
 # Misc issues:
@@ -37,6 +39,6 @@ bazel build --features apple.virtualize_frameworks \
 bazel test --local_test_jobs=1 --apple_platform_type=ios --deleted_packages='' -- //tests/ios/...
 bazel test --local_test_jobs=1 -- //... -//tests/ios/...
 # from xcodeproj tests
-"$(git rev-parse --show-toplevel)"/tests/xcodeproj-tests.sh --clean
+./tests/xcodeproj-tests.sh --clean
 # from lldb tests
 bazel test tests/ios/lldb/app:objc_app_po_test  tests/ios/lldb/app:objc_app_variable_test --config lldb_ios_test
