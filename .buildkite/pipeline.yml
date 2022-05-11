@@ -6,7 +6,7 @@ env:
 
 steps:
   - label: ":macos: :bazel: build virtual frameworks"
-    key: int-tests
+    key: virt-frameworks
     agents:
       queue: macos
     command: .buildkite/virtual-frameworks.sh
