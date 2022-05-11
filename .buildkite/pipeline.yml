@@ -6,12 +6,13 @@ env:
   FLARE_INSIGHTS_API_URL: "https://api.stg.flare.build"
 
 steps:
-  # - label: ":macos: :bazel: build and test everything"
-  #   key: combined
-  #   agents:
-  #     queue: macos
-  #   command: .buildkite/combined.sh
-  #   timeout_in_minutes: 20
+  - label: ":macos: :bazel: build and test everything"
+    key: combined
+    agents:
+      queue: macos
+    command: .buildkite/combined.sh
+    timeout_in_minutes: 20
+    skip: true
 
   - label: ":macos: :bazel: build arm64 simulator"
     key: arm64-sim
@@ -47,6 +48,7 @@ steps:
       queue: macos
     command: .buildkite/xcodeproj-tests.sh
     timeout_in_minutes: 28
+    skip: true
 
   - label: ":macos: :bazel: lldb tests"
     key: lldb-tests
@@ -54,3 +56,4 @@ steps:
       queue: macos
     command: .buildkite/lldb-tests.sh
     timeout_in_minutes: 28
+    skip: true
