@@ -268,14 +268,14 @@ def xchammer_dependencies():
         # question
         # Persisted on github tag=rules_ios-5.0.0,
         commit = "785adc4e33cb0cf7eaf7a05b9be5a8e6c37f6056",
-        patch_cmds = [
-            """
-         sed -i '' 's/\\:__subpackages__/visibility\\:public/g' src/TulsiGenerator/BUILD
-         """,
-            """
-         sed -i '' 's/RunLoopMode\\.defaultRunLoopMode/RunLoop\\.Mode\\.`default`/g' src/TulsiGenerator/ProcessRunner.swift
-         """,
-        ],
+        # patch_cmds = [
+        #     """
+        #  sed -i '' 's/\\:__subpackages__/visibility\\:public/g' src/TulsiGenerator/BUILD
+        #  """,
+        #     """
+        #  sed -i '' 's/RunLoopMode\\.defaultRunLoopMode/RunLoop\\.Mode\\.`default`/g' src/TulsiGenerator/ProcessRunner.swift
+        #  """,
+        # ],
     )
 
     namespaced_new_git_repository(
