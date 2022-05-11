@@ -8,4 +8,5 @@ configure_user_bazelrc
 # clean
 bazel clean
 
+export BAZEL_BIN_SUBDIR=/tests/ios/lldb/app
 bazel test tests/ios/lldb/app:objc_app_po_test  tests/ios/lldb/app:objc_app_variable_test --config lldb_ios_test

@@ -41,4 +41,5 @@ bazel test --local_test_jobs=1 -- //... -//tests/ios/...
 # from xcodeproj tests
 ./tests/xcodeproj-tests.sh --clean
 # from lldb tests
+export BAZEL_BIN_SUBDIR=/tests/ios/lldb/app
 bazel test tests/ios/lldb/app:objc_app_po_test  tests/ios/lldb/app:objc_app_variable_test --config lldb_ios_test
