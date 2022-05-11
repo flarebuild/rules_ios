@@ -34,8 +34,8 @@ bazel build --features apple.virtualize_frameworks \
     -//tests/ios/frameworks/sources-with-prebuilt-binaries/... # Needs more work for pre-built binaries
 
 # from integration tests
-bazel test --local_test_jobs=1 --apple_platform_type=ios --deleted_packages='' -- //tests/ios/...
 bazel test --local_test_jobs=1 -- //... -//tests/ios/...
+bazel test --local_test_jobs=1 --apple_platform_type=ios --deleted_packages='' -- //tests/ios/...
 # from xcodeproj tests
 "$(git rev-parse --show-toplevel)"/tests/xcodeproj-tests.sh --clean
 # from lldb tests
