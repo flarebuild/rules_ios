@@ -1,5 +1,5 @@
 env:
-  # BAZEL_REMOTE_EXECUTOR_URL: grpcs://proxy.stg.flare.build # need to fix staging env config before we use this
+  BAZEL_REMOTE_EXECUTOR_URL: grpcs://proxy.stg.flare.build # need to fix staging env config before we use this
   BAZEL_REMOTE_CACHE_URL: grpcs://proxy.stg.flare.build
   BAZEL_BES_BACKEND: grpcs://bes.stg.flare.build
   BAZEL_BES_RESULTS_URL: "https://insights.stg.flare.build/invocations/"
