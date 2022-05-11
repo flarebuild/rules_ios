@@ -94,7 +94,7 @@ function configure_user_bazelrc() {
         echo build:buildkite --disk_cache= #--disk_cache=$HOME/bazel_disk_cache # https://github.com/bazelbuild/bazel/pull/7512
         echo build:buildkite --repository_cache= --repository_cache=$HOME/bazel_repo_cache
 
-        #mkdir -p /ramfs/bazel_sandbox >/dev/null && echo build:buildkite --sandbox_base=/ramfs/bazel_sandbox
+        mkdir -p /ramfs/bazel_sandbox >/dev/null && echo build:buildkite --sandbox_base=/ramfs/bazel_sandbox
 
         #echo build:buildkite --noshow_progress
         #echo build:buildkite --ui_event_filters=error
@@ -124,7 +124,7 @@ function configure_user_bazelrc() {
         else
             echo build:buildkite --google_default_credentials
         fi
-        #echo build:buildkite --remote_download_toplevel
+        echo build:buildkite --remote_download_toplevel
         echo build:buildkite --remote_max_connections=1000 # speed up reads, maybe
         echo "\n"
     } >"$(git rev-parse --show-toplevel)"/user.bazelrc
