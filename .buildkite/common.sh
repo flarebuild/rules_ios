@@ -124,7 +124,7 @@ function configure_user_bazelrc() {
         else
             echo build:buildkite --google_default_credentials
         fi
-        echo build:buildkite --remote_download_toplevel
+        # echo build:buildkite --remote_download_toplevel
         echo build:buildkite --remote_max_connections=1000 # speed up reads, maybe
         echo "\n"
     } >"$(git rev-parse --show-toplevel)"/user.bazelrc
